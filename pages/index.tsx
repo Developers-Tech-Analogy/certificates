@@ -17,15 +17,56 @@ const Home: React.FC<HomeProps> = () => {
   const [error, setError] = useState("");
   const toast = useToast();
 
+  function showToast(
+    level: "info" | "warning" | "error" | "success",
+    title: string,
+    message: string
+  ) {
+    toast({
+      title: title,
+      description: message,
+      status: level,
+      duration: 3000,
+      isClosable: true,
+      position: "top-right",
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent<EventTarget>) {
     e.preventDefault();
-    toast({
-      title: "Fetching Data",
-      description: "Our minions are getting your certificate",
-      status: "info",
-      duration: 9000,
-      isClosable: true,
+    showToast(
+      "info",
+      "Fetching Data",
+      "Our minions are getting your certificate"
+    );
+    const result = await fetch("/api/createCertificate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        eventName: event,
+      }),
     });
+    const data = await result.json();
+    if (result.status === 201) {
+      showToast(
+        "success",
+        "Yay!!!",
+        "Our minions carried your certificate all the way to your inbox!!!"
+      );
+    } else {
+      if (result.status === 404) {
+        showToast(
+          "error",
+          "Oops!!!",
+          "We couldn't find your certificate. If you think this is a mistake, mail to us at info@techanalogy.org"
+        );
+      } else {
+        showToast("error", "Oops!!!", data.message);
+      }
+    }
   }
 
   return (
@@ -42,52 +83,41 @@ const Home: React.FC<HomeProps> = () => {
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <p className="sr-only">Email address</p>
-              <Tooltip label="Enter the email id you registered with" aria-label="email">
-              <input
-                id="email-address"
-                name="emailID"
-                type="email"
-                required
-                className="appearance-none relative block w-full px-3 py-2 mb-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <Tooltip
+                label="Enter the email id you registered with"
+                aria-label="email"
+              >
+                <input
+                  id="email-address"
+                  name="emailID"
+                  type="email"
+                  required
+                  className="appearance-none relative block w-full px-3 py-2 mb-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Email address"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </Tooltip>
             </div>
             <div className="justify-content-center w-full bg-white rounded-md">
-              <Select placeholder="Select Event" icon={<ArrowUpDownIcon />}>
+              <Select
+                placeholder="Select Event"
+                icon={<ArrowUpDownIcon />}
+                isRequired
+                onChange={(e) => setEvent(e.target.value)}
+              >
                 <option>Autogenix</option>
                 <option>Mechenzie</option>
               </Select>
             </div>
           </div>
-          <div>
-            {responseMessage && (
-              <div>
-                {error ? (
-                  <h4
-                    className={["mb-4 font-medium", "text-red-500"].join(" ")}
-                  >
-                    {responseMessage}
-                  </h4>
-                ) : (
-                  <h4
-                    className={["mb-4 font-medium", "text-green-500"].join(" ")}
-                  >
-                    {responseMessage}
-                  </h4>
-                )}
-              </div>
-            )}
-            <div className="text-center">
-              <Button colorScheme="blue" type="submit">
-                Get Certificate
-              </Button>
-            </div>
+
+          <div className="text-center">
+            <Button colorScheme="blue" type="submit">
+              Get Certificate
+            </Button>
           </div>
         </form>
       </div>
