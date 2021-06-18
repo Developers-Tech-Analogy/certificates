@@ -10,6 +10,7 @@ export default async function createCertificate(
   res: NextApiResponse
 ) {
   try {
+    console.log("hello 1");
     const schema = Joi.object({
       email: Joi.string().required(),
       eventName: Joi.string().valid("Autogenix", "Mechenzie").required(),
@@ -25,6 +26,8 @@ export default async function createCertificate(
       };
     } else {
       try {
+        console.log("hello 2");
+
         const certificateUrl: string =
           "https://s3.ap-south-1.amazonaws.com/org.techanalogy.certificates/Templates/cert-v1.png";
         const { data, error } = await supabase
@@ -42,14 +45,20 @@ export default async function createCertificate(
           });
           return;
         }
+        console.log("hello 3");
+
         let imageResult;
         const fileName = `${data[0].name.replace(
           /\s/g,
           ""
         )}-${value.eventName.replace(/\s/g, "")}`;
+        console.log("hello 4");
+
         console.log(fileName);
         Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
           .then((font) => {
+            console.log("hello 5");
+
             Jimp.read(certificateUrl)
               .then((image) => {
                 image.print(font, 800, 600, data[0].name);
@@ -71,11 +80,11 @@ export default async function createCertificate(
               message: "Error in loading font",
             };
           });
-        mailgun(
-          value.email,
-          "Our minions have got a parcel for you",
-          certificate(`${process.env.HOST}/certificates/${fileName}.png`)
-        );
+        // mailgun(
+        //   value.email,
+        //   "Our minions have got a parcel for you",
+        //   certificate(`${process.env.HOST}/certificates/${fileName}.png`)
+        // );
         res.status(201).json({
           message: "Get Certificate",
         });
