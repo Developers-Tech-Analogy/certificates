@@ -4,7 +4,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
+import AWS from "aws-sdk";
 
+AWS.config.update({
+  accessKeyId: process.env.AWS_KEY,
+  secretAccessKey: process.env.AWS_SECRET,
+  region: process.env.REGION,
+});
 export default async function createCertificate(
   req: NextApiRequest,
   res: NextApiResponse
@@ -52,8 +58,9 @@ export default async function createCertificate(
         Jimp.loadFont(location)
           .then((font) => {
             Jimp.read(certificateUrl)
-              .then((image) => {
+              .then(async (image) => {
                 image.print(font, 800, 600, data[0].name);
+                await uploadToS3(fileName, image);
                 let file =
                   `./public/certificates/${fileName}.` + image.getExtension();
                 image.write(file);
@@ -72,10 +79,12 @@ export default async function createCertificate(
               message: "Error in loading font",
             };
           });
+        const s3Url = `${process.env.S3_URL}${fileName}`;
+        console.log(s3Url);
         mailgun(
           value.email,
           "Our minions have got a parcel for you",
-          certificate(`${process.env.HOST}/certificates/${fileName}.png`)
+          certificate(s3Url)
         );
         res.status(201).json({
           message: "Get Certificate",
@@ -94,3 +103,21 @@ export default async function createCertificate(
     });
   }
 }
+
+const uploadToS3 = async (name: string, image: any) => {
+  const object = await image.getBufferAsync(Jimp.MIME_PNG);
+  let params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: name,
+    Body: object,
+    ContentType: Jimp.MIME_PNG,
+    ACL: "public-read",
+  };
+  try {
+    let uploadPromise = await new AWS.S3().putObject(params).promise();
+    console.log("Successfully stored in bucket");
+  } catch (e) {
+    console.log("Error uploading data: ", e);
+    throw { message: "Unable to add to bucket", status: 500 };
+  }
+};
