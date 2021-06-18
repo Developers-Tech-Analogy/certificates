@@ -84,6 +84,7 @@ export default async function createCertificate(
           "Our minions have got a parcel for you",
           certificate(`${process.env.HOST}/certificates/${fileName}.png`)
         );
+        console.log("smort");
         res.status(201).json({
           message: "Get Certificate",
         });
