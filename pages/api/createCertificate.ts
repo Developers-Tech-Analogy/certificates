@@ -5,7 +5,7 @@ import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
 import { join } from "path";
-
+import RootPath from "app-root-path";
 export default async function createCertificate(
   req: NextApiRequest,
   res: NextApiResponse
@@ -49,15 +49,13 @@ export default async function createCertificate(
         )}-${value.eventName.replace(/\s/g, "")}`;
         console.log(fileName);
         const pathJoin = join(
-          __dirname,
-          "..",
-          "..",
-          "..",
-          "..",
+          RootPath.path,
           "open-sans-64-black",
           "open-sans-64-black.fnt"
         );
         console.log(pathJoin);
+        console.log(__dirname);
+        console.log(FONT_SANS_128_BLACK);
         Jimp.loadFont(pathJoin)
           .then((font) => {
             console.log("hello 5");
