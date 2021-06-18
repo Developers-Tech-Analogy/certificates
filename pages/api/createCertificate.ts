@@ -79,11 +79,11 @@ export default async function createCertificate(
               message: "Error in loading font",
             };
           });
-        // mailgun(
-        //   value.email,
-        //   "Our minions have got a parcel for you",
-        //   certificate(`${process.env.HOST}/certificates/${fileName}.png`)
-        // );
+        mailgun(
+          value.email,
+          "Our minions have got a parcel for you",
+          certificate(`${process.env.HOST}/certificates/${fileName}.png`)
+        );
         res.status(201).json({
           message: "Get Certificate",
         });
