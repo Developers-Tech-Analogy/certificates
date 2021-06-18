@@ -52,12 +52,8 @@ export default async function createCertificate(
         )}-${value.eventName.replace(/\s/g, "")}`;
         console.log(fileName);
 
-        const location = join(
-          serverRuntimeConfig.PROJECT_ROOT,
-          "public",
-          "open-sans-64-black",
-          "open-sans-64-black.fnt"
-        );
+        const location =
+          process.env.HOST + "/open-sans-64-black/open-sans-64-black.fnt";
         console.log(location);
         Jimp.loadFont(location)
           .then((font) => {
