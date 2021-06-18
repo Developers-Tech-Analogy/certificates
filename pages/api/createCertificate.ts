@@ -80,15 +80,20 @@ export default async function createCertificate(
             };
           });
         const s3Url = `${process.env.S3_URL}${fileName}`;
-        await mailgun(
+        mailgun(
           value.email,
           "Our minions have got a parcel for you",
           certificate(s3Url)
-        );
-        console.log(s3Url);
-        res.status(201).json({
-          message: "Get Certificate",
-        });
+        )
+          .then(() => {
+            console.log(s3Url);
+            res.status(201).json({
+              message: "Get Certificate",
+            });
+          })
+          .catch((err) => {
+            throw { message: "error in sending mail" };
+          });
       } catch (e) {
         console.log(e);
         res.status(e.status || 500).json({
