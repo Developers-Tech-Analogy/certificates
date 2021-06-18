@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
+import { join } from "path";
 
 export default async function createCertificate(
   req: NextApiRequest,
@@ -47,7 +48,17 @@ export default async function createCertificate(
           ""
         )}-${value.eventName.replace(/\s/g, "")}`;
         console.log(fileName);
-        Jimp.loadFont(FONT_SANS_128_BLACK)
+        const pathJoin = join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          "..",
+          "open-sans-64-black",
+          "open-sans-64-black.fnt"
+        );
+        console.log(pathJoin);
+        Jimp.loadFont(pathJoin)
           .then((font) => {
             console.log("hello 5");
             Jimp.read(certificateUrl)
