@@ -6,6 +6,9 @@ import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
 import { join } from "path";
 import RootPath from "app-root-path";
+import getConfig from "next/config";
+const { serverRuntimeConfig } = getConfig();
+
 export default async function createCertificate(
   req: NextApiRequest,
   res: NextApiResponse
@@ -48,15 +51,15 @@ export default async function createCertificate(
           ""
         )}-${value.eventName.replace(/\s/g, "")}`;
         console.log(fileName);
-        const pathJoin = join(
-          RootPath.path,
+
+        const location = join(
+          serverRuntimeConfig.PROJECT_ROOT,
+          "public",
           "open-sans-64-black",
           "open-sans-64-black.fnt"
         );
-        console.log(pathJoin);
-        console.log(__dirname);
-        console.log(FONT_SANS_128_BLACK);
-        Jimp.loadFont(pathJoin)
+        console.log(location);
+        Jimp.loadFont(location)
           .then((font) => {
             console.log("hello 5");
             Jimp.read(certificateUrl)
