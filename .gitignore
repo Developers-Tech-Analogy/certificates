@@ -14,7 +14,7 @@
 
 # production
 /build
-/public/certificates
+/public/certificates/*
 
 # misc
 .DS_Store
