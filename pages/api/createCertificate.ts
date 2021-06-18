@@ -1,13 +1,9 @@
 import Joi from "joi";
-import Jimp, { FONT_SANS_128_BLACK } from "jimp";
+import Jimp from "jimp";
 import { NextApiRequest, NextApiResponse } from "next";
 import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
-import { join } from "path";
-import RootPath from "app-root-path";
-import getConfig from "next/config";
-const { serverRuntimeConfig } = getConfig();
 
 export default async function createCertificate(
   req: NextApiRequest,
@@ -21,7 +17,6 @@ export default async function createCertificate(
     const { value, error } = schema.validate(req.body);
     if (error) {
       console.log(error);
-
       throw {
         status: 422,
         message: "Invalid Input",
@@ -38,7 +33,6 @@ export default async function createCertificate(
         console.log(data);
         if (error || data.length === 0) {
           console.log("Error");
-
           console.log(error);
           res.status(404).json({
             message: "Not found",
@@ -57,7 +51,6 @@ export default async function createCertificate(
         console.log(location);
         Jimp.loadFont(location)
           .then((font) => {
-            console.log("hello 5");
             Jimp.read(certificateUrl)
               .then((image) => {
                 image.print(font, 800, 600, data[0].name);
@@ -84,7 +77,6 @@ export default async function createCertificate(
           "Our minions have got a parcel for you",
           certificate(`${process.env.HOST}/certificates/${fileName}.png`)
         );
-        console.log("smort");
         res.status(201).json({
           message: "Get Certificate",
         });
