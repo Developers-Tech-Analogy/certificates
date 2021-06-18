@@ -51,34 +51,9 @@ export default async function createCertificate(
           ""
         )}-${value.eventName.replace(/\s/g, "")}`;
         console.log(fileName);
-
         const location =
           process.env.HOST + "/open-sans-64-black/open-sans-64-black.fnt";
         console.log(location);
-        // Jimp.loadFont(location)
-        //   .then((font) => {
-        //     Jimp.read(certificateUrl)
-        //       .then(async (image) => {
-        //         image.print(font, 800, 600, data[0].name);
-        //         await uploadToS3(fileName, image);
-        //         // let file =
-        //         //   `./public/certificates/${fileName}.` + image.getExtension();
-        //         // image.write(file);
-        //       })
-        //       .catch((error) => {
-        //         throw {
-        //           status: 500,
-        //           message: "Error while reading image",
-        //         };
-        //       });
-        //   })
-        //   .catch((error) => {
-        //     console.log(error.message);
-        //     throw {
-        //       status: 500,
-        //       message: "Error in loading font",
-        //     };
-        //   } );
         const image = await Jimp.read(certificateUrl);
         const imageObject = await image.print(
           await Jimp.loadFont(location),
