@@ -55,45 +55,48 @@ export default async function createCertificate(
         const location =
           process.env.HOST + "/open-sans-64-black/open-sans-64-black.fnt";
         console.log(location);
-        Jimp.loadFont(location)
-          .then((font) => {
-            Jimp.read(certificateUrl)
-              .then(async (image) => {
-                image.print(font, 800, 600, data[0].name);
-                await uploadToS3(fileName, image);
-                let file =
-                  `./public/certificates/${fileName}.` + image.getExtension();
-                image.write(file);
-              })
-              .catch((error) => {
-                throw {
-                  status: 500,
-                  message: "Error while reading image",
-                };
-              });
-          })
-          .catch((error) => {
-            console.log(error.message);
-            throw {
-              status: 500,
-              message: "Error in loading font",
-            };
-          });
+        // Jimp.loadFont(location)
+        //   .then((font) => {
+        //     Jimp.read(certificateUrl)
+        //       .then(async (image) => {
+        //         image.print(font, 800, 600, data[0].name);
+        //         await uploadToS3(fileName, image);
+        //         // let file =
+        //         //   `./public/certificates/${fileName}.` + image.getExtension();
+        //         // image.write(file);
+        //       })
+        //       .catch((error) => {
+        //         throw {
+        //           status: 500,
+        //           message: "Error while reading image",
+        //         };
+        //       });
+        //   })
+        //   .catch((error) => {
+        //     console.log(error.message);
+        //     throw {
+        //       status: 500,
+        //       message: "Error in loading font",
+        //     };
+        //   } );
+        const image = await Jimp.read(certificateUrl);
+        const imageObject = await image.print(
+          await Jimp.loadFont(location),
+          800,
+          600,
+          data[0].name
+        );
+        await uploadToS3(fileName, image);
         const s3Url = `${process.env.S3_URL}${fileName}`;
-        mailgun(
+        await mailgun(
           value.email,
           "Our minions have got a parcel for you",
           certificate(s3Url)
-        )
-          .then(() => {
-            console.log(s3Url);
-            res.status(201).json({
-              message: "Get Certificate",
-            });
-          })
-          .catch((err) => {
-            throw { message: "error in sending mail" };
-          });
+        );
+        console.log(s3Url);
+        res.status(201).json({
+          message: "Get Certificate",
+        });
       } catch (e) {
         console.log(e);
         res.status(e.status || 500).json({
@@ -109,7 +112,7 @@ export default async function createCertificate(
   }
 }
 
-const uploadToS3 = async (name: string, image: any) => {
+const uploadToS3 = async (name: string, image: any): Promise<void> => {
   const object = await image.getBufferAsync(Jimp.MIME_PNG);
   let params = {
     Bucket: process.env.S3_BUCKET_NAME,

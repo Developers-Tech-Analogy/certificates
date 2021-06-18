@@ -8,10 +8,7 @@ mailer.fromTitle = "Certificates @ Tech Analogy";
 mailer.init();
 
 const mailgun = async (receiver: string, subject: string, content: string) => {
-  mailer
-    .send(receiver, subject, content)
-    .then((result) => console.log("Done", result))
-    .catch((error) => console.error("Error: ", error));
+  const data = await mailer.send(receiver, subject, content);
+  console.log(data);
 };
-
 export default mailgun;
