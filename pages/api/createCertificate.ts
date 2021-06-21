@@ -30,7 +30,7 @@ export default async function createCertificate(
     } else {
       try {
         const certificateUrl: string =
-          "https://s3.ap-south-1.amazonaws.com/org.techanalogy.certificates/Templates/cert-v1.png";
+          process.env.TEMPLATE_URL;
         const { data, error } = await supabase
           .from("certificate-details")
           .select()

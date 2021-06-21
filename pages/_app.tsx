@@ -15,7 +15,6 @@ function MyApp({ Component, pageProps }) {
       <ChakraProvider>
         <Component {...pageProps} />
       </ChakraProvider>
-      {/* <Footer /> */}
     </div>
   );
 }
