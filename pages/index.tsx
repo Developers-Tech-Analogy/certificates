@@ -79,8 +79,8 @@ const Home: React.FC<HomeProps> = () => {
             src="./Logotech.png"
             alt="Workflow"
           />
-          <h2 className="mt-6 text-xl font-extrabold text-white">
-            Reap the rewards of your hard work
+          <h2 className="mt-6 text-lg font-extrabold text-white">
+            Reap the Rewards of your hard work!
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
