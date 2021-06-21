@@ -70,20 +70,21 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black py-12 px-4 sm:px-6 lg:px-8">
-      <div className="group max-w-md w-full  border-2 border-white rounded-lg space-y-8 p-11 transition duration-700 ease-in-out hover:bg-gray-200 hover:scale-15 0 cursor-pointer">
+    <div className="min-h-screen flex bg-black">
+      <img className="h-screen w-3/5" src="./background.png" alt="Workflow" />
+      <div className="group max-w-md w-full rounded-lg space-y-8 p-11">
         <div>
           <img
             className="mx-auto h-24 w-auto"
             src="./Logotech.png"
             alt="Workflow"
           />
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white group-hover:text-black">
-            Reap the rewards of your hard work
+          <h2 className="mt-6 text-lg font-extrabold text-white">
+            Reap the Rewards of your hard work!
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="rounded-md  shadow-sm -space-y-px">
             <div>
               <p className="sr-only">Email address</p>
               <Tooltip
@@ -95,17 +96,18 @@ const Home: React.FC<HomeProps> = () => {
                   name="emailID"
                   type="email"
                   required
-                  className="appearance-none relative block w-full px-3 py-2 mb-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
+                  className="appearance-none relative block w-full px-3 py-2 mb-2 bg-transparent border-b-2 border-gray-300 placeholder-gray-500 text-gray-100  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Email ID"
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </Tooltip>
             </div>
-            <div className="justify-content-center w-full bg-white rounded-md">
+            <div className="justify-content-center w-full bg-transparent border-b-2 text-gray-400 sm:text-sm">
               <Select
                 placeholder="Select Event"
                 icon={<ArrowUpDownIcon />}
                 isRequired
+                border="0px"
                 onChange={(e) => setEvent(e.target.value)}
               >
                 <option>Autogenix</option>
@@ -114,11 +116,9 @@ const Home: React.FC<HomeProps> = () => {
             </div>
           </div>
 
-          <div className="text-center">
-            <Button colorScheme="blue" type="submit">
-              Get Certificate
-            </Button>
-          </div>
+          <Button colorScheme="blue" type="submit" w={250}>
+            Get Certificate
+          </Button>
         </form>
       </div>
     </div>
