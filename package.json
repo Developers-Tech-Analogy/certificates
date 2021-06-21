@@ -27,6 +27,7 @@
     "next": "11.0.0",
     "postcss": "^8.3.4",
     "react": "17.0.2",
+    "react-customerly": "^2.0.0",
     "react-dom": "17.0.2",
     "tailwindcss": "^2.1.4",
     "ts-mailgun": "^0.5.0",

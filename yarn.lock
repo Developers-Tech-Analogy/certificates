@@ -4655,6 +4655,11 @@ react-clientside-effect@^1.2.2:
   dependencies:
     "@babel/runtime" "^7.12.13"
 
+react-customerly@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-customerly/-/react-customerly-2.0.0.tgz#0966f437afa401cc6ebc06fdccc4ace3d5359d92"
+  integrity sha512-2vNM8dlxl6xKLAC73nDVH5eNdHcmClNyXzcMC9587NMZnzcTDxNcyY2DoRn8gJXUMeImPkzF7SSuvpI5iptDIQ==
+
 react-dom@17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
