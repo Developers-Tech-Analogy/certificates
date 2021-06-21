@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="author" content="Tech Analogy" />
         <meta property="og:url" content="https://techanalogy.org" />
-        <meta property="og:title" content="Careers @ Tech Analogy" />
+        <meta property="og:title" content="Certificates @ Tech Analogy" />
         <meta property="og:description" content="Reap the rewards of your hard work" />
         <meta
           property="og:image"
