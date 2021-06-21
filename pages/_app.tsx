@@ -13,9 +13,9 @@ function MyApp({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ChakraProvider>
-        <Component {...pageProps} />s
+        <Component {...pageProps} />
       </ChakraProvider>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
