@@ -5,16 +5,20 @@ import React, { useState } from "react";
 import { Button } from "@chakra-ui/button";
 import { useToast } from "@chakra-ui/toast";
 import styles from "../styles/Home.module.css";
-import { Select, Tooltip } from "@chakra-ui/react";
-import { ArrowUpDownIcon } from "@chakra-ui/icons";
+import { IconButton, Select, Tooltip } from "@chakra-ui/react";
+import {
+  ArrowForwardIcon,
+  ArrowRightIcon,
+  ArrowUpDownIcon,
+} from "@chakra-ui/icons";
+import Footer from "../components/Footer";
 
 export interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [email, setEmail] = useState("");
   const [event, setEvent] = useState("");
-  const [responseMessage, setResponseMessage] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const toast = useToast();
 
   function showToast(
@@ -34,6 +38,7 @@ const Home: React.FC<HomeProps> = () => {
 
   async function handleSubmit(e: React.FormEvent<EventTarget>) {
     e.preventDefault();
+    setLoading(true);
     showToast(
       "info",
       "Fetching Data",
@@ -50,6 +55,7 @@ const Home: React.FC<HomeProps> = () => {
       }),
     });
     const data = await result.json();
+    setLoading(false);
     if (result.status === 201) {
       showToast(
         "success",
@@ -71,20 +77,18 @@ const Home: React.FC<HomeProps> = () => {
 
   return (
     <div className="min-h-screen flex bg-black">
-      <img className="h-screen w-3/5" src="./background.png" alt="Workflow" />
-      <div className="group max-w-md w-full rounded-lg space-y-8 p-11">
+      <div className="relative hidden xl:block xl:w-3/5 h-screen">
+        <img className="h-screen" src="./background.png" alt="bg" />
+      </div>
+      <div className="group xl:w-2/5 rounded-lg mx-12 my-12 xl:ml-16 xl:mr-72 xl:mt-44">
         <div>
-          <img
-            className="mx-auto h-24 w-auto"
-            src="./Logotech.png"
-            alt="Workflow"
-          />
+          <img className="h-24 w-auto" src="./Logotech.png" alt="Workflow" />
           <h2 className="mt-6 text-lg font-extrabold text-white">
             Reap the Rewards of your hard work!
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md  shadow-sm -space-y-px">
+          <div className="rounded-md  shadow-sm">
             <div>
               <p className="sr-only">Email address</p>
               <Tooltip
@@ -102,7 +106,7 @@ const Home: React.FC<HomeProps> = () => {
                 />
               </Tooltip>
             </div>
-            <div className="justify-content-center w-full bg-transparent border-b-2 text-gray-400 sm:text-sm">
+            <div className="justify-content-center w-full bg-transparent border-b-2 text-gray-400 sm:text-sm outline-none">
               <Select
                 placeholder="Select Event"
                 icon={<ArrowUpDownIcon />}
@@ -114,11 +118,28 @@ const Home: React.FC<HomeProps> = () => {
                 <option>Mechenzie</option>
               </Select>
             </div>
+            {!loading ? (
+              <Button
+                rightIcon={<ArrowForwardIcon />}
+                colorScheme="teal"
+                variant="solid"
+                marginTop={10}
+                type="submit"
+              >
+                Get Certificate
+              </Button>
+            ) : (
+              <Button
+                rightIcon={<ArrowForwardIcon />}
+                colorScheme="teal"
+                variant="solid"
+                marginTop={10}
+                isLoading
+              >
+                Get Certificate
+              </Button>
+            )}
           </div>
-
-          <Button colorScheme="blue" type="submit" w={250}>
-            Get Certificate
-          </Button>
         </form>
       </div>
     </div>
