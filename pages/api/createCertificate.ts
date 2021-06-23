@@ -18,7 +18,9 @@ export default async function createCertificate(
   try {
     const schema = Joi.object({
       email: Joi.string().required(),
-      eventName: Joi.string().valid("Autogenix", "Mechenzie").required(),
+      eventName: Joi.string()
+        .valid("Autogenix", "Mechenzie", "E-Sports")
+        .required(),
     });
     const { value, error } = schema.validate(req.body);
     if (error) {
@@ -28,50 +30,60 @@ export default async function createCertificate(
         message: "Invalid Input",
       };
     } else {
+      console.log(value);
       try {
-        const certificateUrl: string =
-          process.env.TEMPLATE_URL;
         const { data, error } = await supabase
-          .from("certificate-details")
+          .from("config")
           .select()
-          .eq("email", value.email)
           .eq("eventName", value.eventName);
-        console.log(data);
-        if (error || data.length === 0) {
-          console.log("Error");
-          console.log(error);
-          res.status(404).json({
-            message: "Not found",
+        let certificateUrl = data[0].url;
+        if (error) {
+          res.status(500).json({
+            message: "Error in loading config",
           });
-          return;
+        } else {
+          const { data, error } = await supabase
+            .from("certificate-details")
+            .select()
+            .eq("email", value.email)
+            .eq("eventName", value.eventName);
+          console.log(data);
+          if (error || data.length === 0) {
+            console.log("Error");
+            console.log(error);
+            res.status(404).json({
+              message: "Not found",
+            });
+            return;
+          }
+          const fileName = `${data[0].name.replace(
+            /\s/g,
+            ""
+          )}-${value.eventName.replace(/\s/g, "")}`;
+          console.log(fileName);
+          const location =
+            process.env.HOST + "/open-sans-64-black/open-sans-64-black.fnt";
+          console.log(location);
+          const image = await Jimp.read(certificateUrl);
+          image.resize(1920, 1080);
+          const imageObject = await image.print(
+            await Jimp.loadFont(location),
+            750,
+            400,
+            data[0].name
+          );
+          await uploadToS3(fileName, image);
+          const s3Url = `${process.env.S3_URL}${fileName}`;
+          await mailgun(
+            value.email,
+            "Our minions have got a parcel for you",
+            certificate(s3Url)
+          );
+          console.log(s3Url);
+          res.status(201).json({
+            message: "Get Certificate",
+          });
         }
-        let imageResult;
-        const fileName = `${data[0].name.replace(
-          /\s/g,
-          ""
-        )}-${value.eventName.replace(/\s/g, "")}`;
-        console.log(fileName);
-        const location =
-          process.env.HOST + "/open-sans-64-black/open-sans-64-black.fnt";
-        console.log(location);
-        const image = await Jimp.read(certificateUrl);
-        const imageObject = await image.print(
-          await Jimp.loadFont(location),
-          800,
-          600,
-          data[0].name
-        );
-        await uploadToS3(fileName, image);
-        const s3Url = `${process.env.S3_URL}${fileName}`;
-        await mailgun(
-          value.email,
-          "Our minions have got a parcel for you",
-          certificate(s3Url)
-        );
-        console.log(s3Url);
-        res.status(201).json({
-          message: "Get Certificate",
-        });
       } catch (e) {
         console.log(e);
         res.status(e.status || 500).json({

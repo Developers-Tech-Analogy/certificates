@@ -5,11 +5,13 @@ import React, { useState } from "react";
 import { Button } from "@chakra-ui/button";
 import { useToast } from "@chakra-ui/toast";
 import styles from "../styles/Home.module.css";
-import { IconButton, Select, Tooltip } from "@chakra-ui/react";
+import { IconButton, Select, Switch, Tooltip } from "@chakra-ui/react";
+import Link from "next/link";
 import {
   ArrowForwardIcon,
   ArrowRightIcon,
   ArrowUpDownIcon,
+  WarningTwoIcon,
 } from "@chakra-ui/icons";
 import Footer from "../components/Footer";
 
@@ -76,14 +78,16 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-black">
+    <div className={[styles.content, "min-h-screen flex bg-black"].join(" ")}>
       <div className="relative hidden xl:block xl:w-3/5 h-screen">
         <img className="h-screen" src="./background.png" alt="bg" />
       </div>
       <div className="group xl:w-2/5 rounded-lg mx-12 my-12 xl:ml-16 xl:mr-72 xl:mt-44">
         <div>
-          <img className="h-24 w-auto" src="./Logotech.png" alt="Workflow" />
-          <h2 className="mt-6 text-lg font-extrabold text-white">
+          <a href="https://techanalogy.org">
+            <Image src="/Logotech.png" width={420} height={150} alt="logo" />
+          </a>
+          <h2 className="mt-6 text-2xl font-extrabold text-white">
             Reap the Rewards of your hard work!
           </h2>
         </div>
@@ -116,29 +120,30 @@ const Home: React.FC<HomeProps> = () => {
               >
                 <option>Autogenix</option>
                 <option>Mechenzie</option>
+                <option>E-Sports</option>
               </Select>
             </div>
-            {!loading ? (
-              <Button
-                rightIcon={<ArrowForwardIcon />}
-                colorScheme="teal"
-                variant="solid"
-                marginTop={10}
-                type="submit"
-              >
-                Get Certificate
-              </Button>
-            ) : (
-              <Button
-                rightIcon={<ArrowForwardIcon />}
-                colorScheme="teal"
-                variant="solid"
-                marginTop={10}
-                isLoading
-              >
-                Get Certificate
-              </Button>
-            )}
+            <div className="flex pt-10">
+              {!loading ? (
+                <Button
+                  rightIcon={<ArrowForwardIcon />}
+                  colorScheme="teal"
+                  variant="solid"
+                  type="submit"
+                >
+                  Get Certificate
+                </Button>
+              ) : (
+                <Button
+                  rightIcon={<ArrowForwardIcon />}
+                  colorScheme="teal"
+                  variant="solid"
+                  isLoading
+                >
+                  Get Certificate
+                </Button>
+              )}
+            </div>
           </div>
         </form>
       </div>
