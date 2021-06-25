@@ -36,7 +36,8 @@ export default async function createCertificate(
           .from("config")
           .select()
           .eq("eventName", value.eventName);
-        let certificateUrl = data[0].url;
+        const certificateUrl = data[0].url;
+        const colour = data[0].colour;
         if (error) {
           res.status(500).json({
             message: "Error in loading config",
@@ -62,7 +63,7 @@ export default async function createCertificate(
           )}-${value.eventName.replace(/\s/g, "")}`;
           console.log(fileName);
           const location =
-            process.env.HOST + "/open-sans-64-black/open-sans-64-black.fnt";
+            process.env.HOST + `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`;
           console.log(location);
           const image = await Jimp.read(certificateUrl);
           image.resize(1920, 1080);
@@ -71,6 +72,12 @@ export default async function createCertificate(
             750,
             400,
             data[0].name
+          );
+          await image.print(
+            await Jimp.loadFont(process.env.HOST + `/open-sans-16-${colour}/open-sans-16-${colour}.fnt`),
+            40,
+            20,
+            `Check for validity at ${process.env.HOST}/verify/${data[0].certificateId}`
           );
           await uploadToS3(fileName, image);
           const s3Url = `${process.env.S3_URL}${fileName}`;
