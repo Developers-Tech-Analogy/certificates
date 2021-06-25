@@ -57,8 +57,7 @@ Please read `Contributing.md` for details on our code of conduct, and the proces
 
 ## Shout outs 💥
 
-| <p align="center">![Sagnik Biswas](https://github.com/sbiswas2209.png?size=128)<br>[Sagnik Biswas](https://sagnikbiswas.tech)</p> | <p align="center">![Shashank Kumar](https://github.com/shawshankkumar.png?size=128)<br>[Shashank Kumar](https://github.com/shawshankkumar)</p> | <p align="center">![Kaushik Kumaran](https://github.com/Codebuilder2022.png?size=128)<br>[Kaushik Kumaran](https://github.com/Codebuilder2022)</p> |
-| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+<p align="center">![Sagnik Biswas](https://github.com/sbiswas2209.png?size=128)<br>[Sagnik Biswas](https://sagnikbiswas.tech)</p><p align="center">![Shashank Kumar](https://github.com/shawshankkumar.png?size=128)<br>[Shashank Kumar](https://github.com/shawshankkumar)</p><p align="center">![Kaushik Kumaran](https://github.com/Codebuilder2022.png?size=128)<br>[Kaushik Kumaran](https://github.com/Codebuilder2022)</p>
 
 ## Forking this repo 🚨
 
