@@ -1,28 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
-import Head from "next/head";
+import { ArrowForwardIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/router";
+import { Tooltip, Select, Button, useToast } from "@chakra-ui/react";
 import Image from "next/image";
-import React, { useState } from "react";
-import { Button } from "@chakra-ui/button";
-import { useToast } from "@chakra-ui/toast";
-import styles from "../styles/Home.module.css";
-import { IconButton, Select, Switch, Tooltip } from "@chakra-ui/react";
 import Link from "next/link";
-import {
-  ArrowForwardIcon,
-  ArrowRightIcon,
-  ArrowUpDownIcon,
-  WarningTwoIcon,
-} from "@chakra-ui/icons";
-import Footer from "../components/Footer";
+import React, { useEffect, useState } from "react";
+import styles from "../../styles/Home.module.css";
+export interface VerifyPageByIdProps {}
 
-export interface HomeProps {}
-
-const Home: React.FC<HomeProps> = () => {
-  const [email, setEmail] = useState("");
-  const [event, setEvent] = useState("");
-  const [loading, setLoading] = useState(false);
+const VerifyPageById: React.FC<VerifyPageByIdProps> = () => {
   const toast = useToast();
-
+  const [id, setID] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [participantName, setParticipantName] = useState("");
+  const [participantEvent, setParticipantEvent] = useState("");
+  const router = useRouter();
+  useEffect(() => {
+    if (router.query.id !== undefined) {
+      const id = router.query.id;
+      console.log(id);
+      setID(id.toString());
+    }
+  }, [router.query.id]);
   function showToast(
     level: "info" | "warning" | "error" | "success",
     title: string,
@@ -37,46 +36,60 @@ const Home: React.FC<HomeProps> = () => {
       position: "top-right",
     });
   }
-
-  async function handleSubmit(e: React.FormEvent<EventTarget>) {
+  const handleSubmit = async (e: React.FormEvent<EventTarget>) => {
     e.preventDefault();
     setLoading(true);
     showToast(
       "info",
-      "Fetching Data",
-      "Our minions are getting your certificate"
+      "Verifying Data",
+      "Our minions are getting the relevant data"
     );
-    const result = await fetch("/api/createCertificate", {
+    const result = await fetch("/api/verifyCertificate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: email,
-        eventName: event,
+        id: id,
       }),
     });
-    const data = await result.json();
-    setLoading(false);
-    if (result.status === 201) {
+    console.log(result.status);
+    if (result.status === 200) {
       showToast(
         "success",
-        "Yay!!!",
-        "Our minions carried your certificate all the way to your inbox!!!"
+        "Yay! Certificate Found",
+        "Our minions have the data you requested"
       );
+      const data = await result.json();
+      console.log(data.participant.name);
+      setParticipantEvent(data.participant.eventName);
+      setParticipantName(data.participant.name);
     } else {
+      setParticipantEvent("");
+      setParticipantName("");
       if (result.status === 404) {
         showToast(
-          "error",
-          "Oops!!!",
-          "We couldn't find your certificate. If you think this is a mistake, mail to us at info@techanalogy.org"
+          "warning",
+          "Certificate Not Found",
+          "The certificate does not exist"
+        );
+      }
+      else if(result.status === 422){
+        showToast(
+          "warning",
+          "Invalid ID",
+          "The given ID is invalid"
         );
       } else {
-        showToast("error", "Oops!!!", data.message);
+        showToast(
+          "error",
+          "Oops! We ran into an error",
+          "We ran into an error. We'll look into it to get us up & going"
+        );
       }
     }
-  }
-
+    setLoading(false);
+  };
   return (
     <div className={[styles.content, "min-h-screen flex bg-black"].join(" ")}>
       <div className="relative hidden xl:block xl:w-3/5 h-screen">
@@ -88,40 +101,28 @@ const Home: React.FC<HomeProps> = () => {
             <Image src="/Logotech.png" width={420} height={150} alt="logo" />
           </a>
           <h2 className="mt-6 text-2xl font-extrabold text-white">
-            Reap the Rewards of your hard work!
+            Not just a certificate but a trusted proof of your skills
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md  shadow-sm">
             <div>
-              <p className="sr-only">Email address</p>
+              <p className="sr-only">Certificate ID</p>
               <Tooltip
                 label="Enter the email id you registered with"
                 aria-label="email"
               >
                 <input
                   id="email-address"
-                  name="emailID"
-                  type="email"
+                  name="certificateID"
+                  type="certificate"
                   required
+                  value={id}
                   className="appearance-none relative block w-full px-3 py-2 mb-2 bg-transparent border-b-2 border-gray-300 placeholder-gray-500 text-gray-100  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Email ID"
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Certificate ID"
+                  onChange={(e) => setID(e.target.value)}
                 />
               </Tooltip>
-            </div>
-            <div className="justify-content-center w-full bg-transparent border-b-2 text-gray-400 sm:text-sm outline-none">
-              <Select
-                placeholder="Select Event"
-                icon={<ArrowUpDownIcon />}
-                isRequired
-                border="0px"
-                onChange={(e) => setEvent(e.target.value)}
-              >
-                <option>Autogenix</option>
-                <option>Mechenzie</option>
-                <option>E-Sports</option>
-              </Select>
             </div>
             <div className="pt-10">
               {!loading ? (
@@ -131,7 +132,7 @@ const Home: React.FC<HomeProps> = () => {
                   variant="solid"
                   type="submit"
                 >
-                  Get Certificate
+                  Verify Certificate
                 </Button>
               ) : (
                 <Button
@@ -140,27 +141,38 @@ const Home: React.FC<HomeProps> = () => {
                   variant="solid"
                   isLoading
                 >
-                  Get Certificate
+                  Verify Certificate
                 </Button>
               )}
               <br />
               <br />
-              <Link href="/verify" passHref>
+              <Link href="/" passHref>
                 <Button
-                  rightIcon={<ArrowForwardIcon />}
+                  rightIcon={<ArrowBackIcon />}
                   colorScheme="teal"
                   variant="outline"
-                  type="submit"
                 >
-                  Verify Certificate
+                  Home
                 </Button>
               </Link>
             </div>
           </div>
         </form>
+        {participantName.length !== 0 ? (
+          <div className="pt-10">
+            <h1 className="text-xl font-semibold text-white py-3">
+              Name : {participantName}
+            </h1>
+            <h1 className="text-xl font-semibold text-white py-3">
+              Event : {participantEvent}
+            </h1>
+          </div>
+        ) : (
+          <div></div>
+        )}
       </div>
     </div>
   );
 };
 
-export default Home;
+export default VerifyPageById;
