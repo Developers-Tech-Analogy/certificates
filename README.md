@@ -11,7 +11,7 @@ crafted with <span style="color: #8b0000;">&hearts;</span> by your friends on th
 </p>
 <p align="center">
     <img src="https://img.shields.io/badge/version-1.0.0-yellowgreen" alt="version 1.0.0"/>
-    <img src="https://img.shields.io/badge/license-MPL-2.0-orange" alt="license Mozilla"/>
+    <img src="https://img.shields.io/badge/license-Mozilla-orange" alt="license Mozilla"/>
     <img src="https://img.shields.io/badge/author-Tech%20Analogy-blue" alt="author TechAnalogy"/>
 </p>
 
