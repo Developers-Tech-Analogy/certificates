@@ -16,11 +16,8 @@
     "@jimp/plugin-print": "^0.16.1",
     "@supabase/supabase-js": "^1.15.1",
     "@types/cors": "^2.8.10",
-<<<<<<< HEAD
     "@types/multer": "^1.4.6",
     "@types/multer-s3": "^2.7.9",
-=======
->>>>>>> 208e8864d49a6577b619b03d830b000124584a38
     "@types/node": "^15.12.2",
     "@types/react": "^17.0.11",
     "autoprefixer": "^10.2.6",
@@ -31,12 +28,9 @@
     "jimp": "^0.16.1",
     "joi": "^17.4.0",
     "mailgun.js": "^3.4.0",
-<<<<<<< HEAD
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
-=======
     "nanoid": "^3.1.23",
->>>>>>> 208e8864d49a6577b619b03d830b000124584a38
     "next": "11.0.0",
     "next-connect": "^0.10.1",
     "next-themes": "^0.0.14",
