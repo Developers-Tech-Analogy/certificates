@@ -121,7 +121,9 @@ const Home: React.FC<HomeProps> = ({ data }) => {
                 onChange={(e) => setEvent(e.target.value)}
               >
                 {data.map((element) => (
-                  <option>{element.eventName}</option>
+                  <option className="text-black font-bold">
+                    {element.eventName}
+                  </option>
                 ))}
               </Select>
             </div>
@@ -168,9 +170,12 @@ const Home: React.FC<HomeProps> = ({ data }) => {
 export default Home;
 
 export async function getStaticProps() {
-  const { data, error } = await supabase.from("config").select("eventName");
-  if (error) console.log(error);
+  const eventsData = await fetch(`${process.env.HOST}/api/fetchEventNames`, {
+    method: "GET",
+  });
+  let jsonData = await eventsData.json();
+  console.log();
   return {
-    props: { data: data },
+    props: { data: jsonData.data },
   };
 }
