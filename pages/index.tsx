@@ -120,8 +120,8 @@ const Home: React.FC<HomeProps> = ({ data }) => {
                 border="0px"
                 onChange={(e) => setEvent(e.target.value)}
               >
-                {data.map((element) => (
-                  <option className="text-black font-bold">
+                {data.map((element, index) => (
+                  <option className="text-black font-bold" key={index}>
                     {element.eventName}
                   </option>
                 ))}
@@ -170,12 +170,8 @@ const Home: React.FC<HomeProps> = ({ data }) => {
 export default Home;
 
 export async function getStaticProps() {
-  const eventsData = await fetch(`${process.env.HOST}/api/fetchEventNames`, {
-    method: "GET",
-  });
-  let jsonData = await eventsData.json();
-  console.log();
+  const { data, error } = await supabase.from("config").select("eventName");
   return {
-    props: { data: jsonData.data },
+    props: { data: data },
   };
 }
