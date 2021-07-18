@@ -118,6 +118,9 @@ const Home: React.FC<HomeProps> = () => {
                 border="0px"
                 onChange={(e) => setEvent(e.target.value)}
               >
+                {" "}
+                <option>Cloudnet</option>
+                <option>Cloudnet-COE</option>
                 <option>Autogenix</option>
                 <option>Mechenzie</option>
                 <option>E-Sports</option>
