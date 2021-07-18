@@ -40,7 +40,7 @@ export default async function createCertificate(
         (x = 340), (y = 500);
         (x1 = 400), (y1 = 20);
       }
-      if ((value.eventName = "Cloudnet-COE")) {
+      if (value.eventName === "Cloudnet-COE") {
         (x = 700), (y = 500);
         (x1 = 400), (y1 = 40);
       }
@@ -56,6 +56,7 @@ export default async function createCertificate(
             message: "Error in loading config",
           });
         } else {
+          console.log(value.eventName);
           const { data, error } = await supabase
             .from("certificate-details")
             .select()
