@@ -77,17 +77,14 @@ export default async function createCertificate(
           )}-${value.eventName.replace(/\s/g, "")}`;
           console.log(fileName);
           const location =
-            process.env.HOST +
-            `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`;
+            process.env.HOST + `/open-sans-64-black/open-sans-64-black.fnt`;
           console.log(location);
           const image = await Jimp.read(certificateUrl);
 
           image.resize(1920, 1080);
 
           const imageObject = await image.print(
-            await Jimp.loadFont(
-              "http://localhost:3000/open-sans-64-black/open-sans-64-black.fnt"
-            ),
+            await Jimp.loadFont(location),
             x,
             y,
             data[0].name
