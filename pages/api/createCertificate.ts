@@ -5,6 +5,7 @@ import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
 import AWS from "aws-sdk";
+import { valueScaleCorrection } from "framer-motion/types/render/dom/projection/scale-correction";
 
 AWS.config.update({
   accessKeyId: process.env.AWS_KEY,
@@ -19,7 +20,7 @@ export default async function createCertificate(
     const schema = Joi.object({
       email: Joi.string().required(),
       eventName: Joi.string()
-        .valid("Autogenix", "Mechenzie", "E-Sports")
+        .valid("Autogenix", "Mechenzie", "E-Sports", "Cloudnet", "Cloudnet-COE")
         .required(),
     });
     const { value, error } = schema.validate(req.body);
@@ -31,6 +32,18 @@ export default async function createCertificate(
       };
     } else {
       console.log(value);
+      let x = 750,
+        y = 400,
+        x1 = 40,
+        y1 = 20;
+      if (value.eventName === "Cloudnet") {
+        (x = 340), (y = 500);
+        (x1 = 400), (y1 = 20);
+      }
+      if (value.eventName === "Cloudnet-COE") {
+        (x = 700), (y = 500);
+        (x1 = 400), (y1 = 40);
+      }
       try {
         const { data, error } = await supabase
           .from("config")
@@ -43,6 +56,7 @@ export default async function createCertificate(
             message: "Error in loading config",
           });
         } else {
+          console.log(value.eventName);
           const { data, error } = await supabase
             .from("certificate-details")
             .select()
@@ -63,20 +77,28 @@ export default async function createCertificate(
           )}-${value.eventName.replace(/\s/g, "")}`;
           console.log(fileName);
           const location =
-            process.env.HOST + `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`;
+            process.env.HOST +
+            `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`;
           console.log(location);
           const image = await Jimp.read(certificateUrl);
+
           image.resize(1920, 1080);
+
           const imageObject = await image.print(
-            await Jimp.loadFont(location),
-            750,
-            400,
+            await Jimp.loadFont(
+              "http://localhost:3000/open-sans-64-black/open-sans-64-black.fnt"
+            ),
+            x,
+            y,
             data[0].name
           );
+
           await image.print(
-            await Jimp.loadFont(process.env.HOST + `/open-sans-16-${colour}/open-sans-16-${colour}.fnt`),
-            40,
-            20,
+            await Jimp.loadFont(
+              process.env.HOST + `/open-sans-16-black/open-sans-16-black.fnt`
+            ),
+            x1,
+            y1,
             `Check for validity at ${process.env.HOST}/verify/${data[0].certificateId}`
           );
           await uploadToS3(fileName, image);
@@ -99,6 +121,7 @@ export default async function createCertificate(
       }
     }
   } catch (e) {
+    console.log(e.message);
     console.log(e);
     res.status(e.status || 500).json({
       message: e.message || "An unexpected error occurred",
