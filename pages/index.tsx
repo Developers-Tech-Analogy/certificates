@@ -14,15 +14,17 @@ import {
   WarningTwoIcon,
 } from "@chakra-ui/icons";
 import Footer from "../components/Footer";
+import supabase from "../common/supabase";
 
-export interface HomeProps {}
+export interface HomeProps {
+  data: Array<{ eventName: string }>;
+}
 
-const Home: React.FC<HomeProps> = () => {
+const Home: React.FC<HomeProps> = ({ data }) => {
   const [email, setEmail] = useState("");
   const [event, setEvent] = useState("");
   const [loading, setLoading] = useState(false);
   const toast = useToast();
-
   function showToast(
     level: "info" | "warning" | "error" | "success",
     title: string,
@@ -118,12 +120,11 @@ const Home: React.FC<HomeProps> = () => {
                 border="0px"
                 onChange={(e) => setEvent(e.target.value)}
               >
-                {" "}
-                <option>Cloudnet</option>
-                <option>Cloudnet-COE</option>
-                <option>Autogenix</option>
-                <option>Mechenzie</option>
-                <option>E-Sports</option>
+                {data.map((element, index) => (
+                  <option className="text-black font-bold" key={index}>
+                    {element.eventName}
+                  </option>
+                ))}
               </Select>
             </div>
             <div className="pt-10">
@@ -167,3 +168,10 @@ const Home: React.FC<HomeProps> = () => {
 };
 
 export default Home;
+
+export async function getStaticProps() {
+  const { data, error } = await supabase.from("config").select("eventName");
+  return {
+    props: { data: data },
+  };
+}
