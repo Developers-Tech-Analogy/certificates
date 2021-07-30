@@ -69,7 +69,6 @@ export default async function createCertificate(
             ""
           )}-${value.eventName.replace(/\s/g, "")}`;
           console.log(fileName);
-
           const image = await Jimp.read(certificateUrl);
 
           image.resize(1920, 1080);
