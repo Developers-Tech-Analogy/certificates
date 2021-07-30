@@ -38,9 +38,11 @@ export default async function createCertificate(
           .eq("eventName", value.eventName);
         const certificateUrl = data[0].url;
         const colour = data[0].colour;
-        //Default co-ordinates of the text to be printed on the certificate.
         if (!(data[0].xc && data[0].xc1 && data[0].yc && data[0].yc1))
           throw { status: 500, message: "Unable to find the co-ordinates" };
+
+        //750,400,20 and 40 are the default co-ordinates of the text to be printed on the certificate.
+
         let x = data[0].xc || 750,
           y = data[0].yc || 400,
           x1 = data[0].xc1 || 40,
