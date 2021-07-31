@@ -5,13 +5,13 @@ import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
 import AWS from "aws-sdk";
-import { valueScaleCorrection } from "framer-motion/types/render/dom/projection/scale-correction";
 
 AWS.config.update({
   accessKeyId: process.env.AWS_KEY,
   secretAccessKey: process.env.AWS_SECRET,
   region: "ap-south-1",
 });
+
 export default async function createCertificate(
   req: NextApiRequest,
   res: NextApiResponse
@@ -31,19 +31,6 @@ export default async function createCertificate(
         message: "Invalid Input",
       };
     } else {
-      console.log(value);
-      let x = 750,
-        y = 400,
-        x1 = 40,
-        y1 = 20;
-      if (value.eventName === "Cloudnet") {
-        (x = 340), (y = 500);
-        (x1 = 400), (y1 = 20);
-      }
-      if (value.eventName === "Cloudnet-COE") {
-        (x = 700), (y = 500);
-        (x1 = 400), (y1 = 40);
-      }
       try {
         const { data, error } = await supabase
           .from("config")
@@ -51,12 +38,20 @@ export default async function createCertificate(
           .eq("eventName", value.eventName);
         const certificateUrl = data[0].url;
         const colour = data[0].colour;
+        if (!(data[0].xc && data[0].xc1 && data[0].yc && data[0].yc1))
+          throw { status: 500, message: "Unable to find the co-ordinates" };
+
+        //750,400,20 and 40 are the default co-ordinates of the text to be printed on the certificate.
+
+        let x = data[0].xc || 750,
+          y = data[0].yc || 400,
+          x1 = data[0].xc1 || 40,
+          y1 = data[0].yc1 || 20;
         if (error) {
           res.status(500).json({
             message: "Error in loading config",
           });
         } else {
-          console.log(value.eventName);
           const { data, error } = await supabase
             .from("certificate-details")
             .select()
@@ -76,15 +71,15 @@ export default async function createCertificate(
             ""
           )}-${value.eventName.replace(/\s/g, "")}`;
           console.log(fileName);
-          const location =
-            process.env.HOST + `/open-sans-64-black/open-sans-64-black.fnt`;
-          console.log(location);
           const image = await Jimp.read(certificateUrl);
 
           image.resize(1920, 1080);
 
-          const imageObject = await image.print(
-            await Jimp.loadFont(location),
+          await image.print(
+            await Jimp.loadFont(
+              process.env.HOST +
+                `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`
+            ),
             x,
             y,
             data[0].name
@@ -92,7 +87,8 @@ export default async function createCertificate(
 
           await image.print(
             await Jimp.loadFont(
-              process.env.HOST + `/open-sans-16-black/open-sans-16-black.fnt`
+              process.env.HOST +
+                `/open-sans-16-${colour}/open-sans-16-${colour}.fnt`
             ),
             x1,
             y1,
@@ -136,7 +132,7 @@ const uploadToS3 = async (name: string, image: any): Promise<void> => {
     ACL: "public-read",
   };
   try {
-    let uploadPromise = await new AWS.S3().putObject(params).promise();
+    await new AWS.S3().putObject(params).promise();
     console.log("Successfully stored in bucket");
   } catch (e) {
     console.log("Error uploading data: ", e);
