@@ -6,7 +6,7 @@ import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
 import AWS from "aws-sdk";
 import { valueScaleCorrection } from "framer-motion/types/render/dom/projection/scale-correction";
-
+//test
 AWS.config.update({
   accessKeyId: process.env.AWS_KEY,
   secretAccessKey: process.env.AWS_SECRET,
