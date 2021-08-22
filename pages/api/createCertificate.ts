@@ -5,6 +5,9 @@ import supabase from "../../common/supabase";
 import mailgun from "../../common/mailgun";
 import certificate from "../../common/templates/certificate";
 import AWS from "aws-sdk";
+import cors from "cors";
+
+const corsVar = cors({ origin: true });
 
 AWS.config.update({
   accessKeyId: process.env.AWS_KEY,
@@ -16,110 +19,119 @@ export default async function createCertificate(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  try {
-    const schema = Joi.object({
-      email: Joi.string().required(),
-      eventName: Joi.string()
-        .valid("Autogenix", "Mechenzie", "E-Sports", "Cloudnet", "Cloudnet-COE")
-        .required(),
-    });
-    const { value, error } = schema.validate(req.body);
-    if (error) {
-      console.log(error);
-      throw {
-        status: 422,
-        message: "Invalid Input",
-      };
-    } else {
-      try {
-        const { data, error } = await supabase
-          .from("config")
-          .select()
-          .eq("eventName", value.eventName);
-        const certificateUrl = data[0].url;
-        const colour = data[0].colour;
-        if (!(data[0].xc && data[0].xc1 && data[0].yc && data[0].yc1))
-          throw { status: 500, message: "Unable to find the co-ordinates" };
-
-        //750,400,20 and 40 are the default co-ordinates of the text to be printed on the certificate.
-
-        let x = data[0].xc || 750,
-          y = data[0].yc || 400,
-          x1 = data[0].xc1 || 40,
-          y1 = data[0].yc1 || 20;
-        if (error) {
-          res.status(500).json({
-            message: "Error in loading config",
-          });
-        } else {
+  corsVar(req, res, async () => {
+    try {
+      const schema = Joi.object({
+        email: Joi.string().required(),
+        eventName: Joi.string()
+          .valid(
+            "Autogenix",
+            "Mechenzie",
+            "E-Sports",
+            "Cloudnet",
+            "Cloudnet-COE"
+          )
+          .required(),
+      });
+      const { value, error } = schema.validate(req.body);
+      if (error) {
+        console.log(error);
+        throw {
+          status: 422,
+          message: "Invalid Input",
+        };
+      } else {
+        try {
           const { data, error } = await supabase
-            .from("certificate-details")
+            .from("config")
             .select()
-            .eq("email", value.email)
             .eq("eventName", value.eventName);
-          console.log(data);
-          if (error || data.length === 0) {
-            console.log("Error");
-            console.log(error);
-            res.status(404).json({
-              message: "Not found",
+          const certificateUrl = data[0].url;
+          const colour = data[0].colour;
+          if (!(data[0].xc && data[0].xc1 && data[0].yc && data[0].yc1))
+            throw { status: 500, message: "Unable to find the co-ordinates" };
+
+          //750,400,20 and 40 are the default co-ordinates of the text to be printed on the certificate.
+
+          let x = data[0].xc || 750,
+            y = data[0].yc || 400,
+            x1 = data[0].xc1 || 40,
+            y1 = data[0].yc1 || 20;
+          if (error) {
+            res.status(500).json({
+              message: "Error in loading config",
             });
-            return;
+          } else {
+            const { data, error } = await supabase
+              .from("certificate-details")
+              .select()
+              .eq("email", value.email)
+              .eq("eventName", value.eventName);
+            console.log(data);
+            if (error || data.length === 0) {
+              console.log("Error");
+              console.log(error);
+              res.status(404).json({
+                message: "Not found",
+              });
+              return;
+            }
+            const fileName = `${data[0].name.replace(
+              /\s/g,
+              ""
+            )}-${value.eventName.replace(/\s/g, "")}`;
+            console.log(fileName);
+            const image = await Jimp.read(certificateUrl);
+
+            image.resize(1920, 1080);
+
+            await image.print(
+              await Jimp.loadFont(
+                process.env.HOST +
+                  `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`
+              ),
+              x,
+              y,
+              data[0].name
+            );
+
+            await image.print(
+              await Jimp.loadFont(
+                process.env.HOST +
+                  `/open-sans-16-${colour}/open-sans-16-${colour}.fnt`
+              ),
+              x1,
+              y1,
+              `Check for validity at ${process.env.HOST}/verify/${data[0].certificateId}`
+            );
+            await uploadToS3(fileName, image);
+            const s3Url = `${process.env.S3_URL}${fileName}`;
+            await mailgun(
+              value.email,
+              "Our minions have got a parcel for you",
+              certificate(s3Url)
+            );
+            console.log(s3Url);
+            res.status(201).json({
+              message: "Get Certificate",
+              S3_URL: s3Url,
+            });
           }
-          const fileName = `${data[0].name.replace(
-            /\s/g,
-            ""
-          )}-${value.eventName.replace(/\s/g, "")}`;
-          console.log(fileName);
-          const image = await Jimp.read(certificateUrl);
-
-          image.resize(1920, 1080);
-
-          await image.print(
-            await Jimp.loadFont(
-              process.env.HOST +
-                `/open-sans-64-${colour}/open-sans-64-${colour}.fnt`
-            ),
-            x,
-            y,
-            data[0].name
-          );
-
-          await image.print(
-            await Jimp.loadFont(
-              process.env.HOST +
-                `/open-sans-16-${colour}/open-sans-16-${colour}.fnt`
-            ),
-            x1,
-            y1,
-            `Check for validity at ${process.env.HOST}/verify/${data[0].certificateId}`
-          );
-          await uploadToS3(fileName, image);
-          const s3Url = `${process.env.S3_URL}${fileName}`;
-          await mailgun(
-            value.email,
-            "Our minions have got a parcel for you",
-            certificate(s3Url)
-          );
-          console.log(s3Url);
-          res.status(201).json({
-            message: "Get Certificate",
+        } catch (e) {
+          console.log(e);
+          res.status(e.status || 500).json({
+            message: e.message || "An unexpected error occurred",
           });
         }
-      } catch (e) {
-        console.log(e);
-        res.status(e.status || 500).json({
-          message: e.message || "An unexpected error occurred",
-        });
       }
+    } catch (e) {
+      console.log(e.message);
+      console.log(e);
+      res.status(e.status || 500).json({
+        message: e.message || "An unexpected error occurred",
+      });
     }
-  } catch (e) {
-    console.log(e.message);
-    console.log(e);
-    res.status(e.status || 500).json({
-      message: e.message || "An unexpected error occurred",
-    });
-  }
+  });
 }
 
 const uploadToS3 = async (name: string, image: any): Promise<void> => {
