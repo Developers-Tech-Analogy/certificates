@@ -29,7 +29,9 @@ export default async function createCertificate(
             "Mechenzie",
             "E-Sports",
             "Cloudnet",
-            "Cloudnet-COE"
+            "Cloudnet-COE",
+            "Robonetics",
+            "Robonetics-COE"
           )
           .required(),
       });
@@ -106,11 +108,11 @@ export default async function createCertificate(
             );
             await uploadToS3(fileName, image);
             const s3Url = `${process.env.S3_URL}${fileName}`;
-            await mailgun(
-              value.email,
-              "Our minions have got a parcel for you",
-              certificate(s3Url)
-            );
+            // await mailgun(
+            //   value.email,
+            //   "Our minions have got a parcel for you",
+            //   certificate(s3Url)
+            // );
             console.log(s3Url);
             res.status(201).json({
               message: "Get Certificate",

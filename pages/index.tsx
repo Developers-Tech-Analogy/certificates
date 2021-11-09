@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/icons";
 import Footer from "../components/Footer";
 import supabase from "../common/supabase";
+import router from "next/router";
 
 export interface HomeProps {
   data: Array<{ eventName: string }>;
@@ -64,8 +65,9 @@ const Home: React.FC<HomeProps> = ({ data }) => {
       showToast(
         "success",
         "Yay!!!",
-        "Our minions carried your certificate all the way to your inbox!!!"
+        "Our minions have generated your certificate!!!"
       );
+      router.push(`/view/${encodeURIComponent(data.S3_URL)}`);
     } else {
       if (result.status === 404) {
         showToast(
